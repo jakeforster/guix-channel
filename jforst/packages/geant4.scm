@@ -1,0 +1,599 @@
+;;;
+;;; Copyright (C) 2022 Emmanuel Medernach <Emmanuel.Medernach@iphc.cnrs.fr>
+;;; Copyright (C) 2023 Jake Forster <jakecameron.forster@gmail.com>
+;;;
+;;; This program is free software: you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation, either version 3 of the License, or
+;;; (at your option) any later version.
+;;;
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; This file is NOT part of the Guix project.
+
+;;; This work started from a PR submitted by Emmanuel Medernach to guix-science.
+;;; https://github.com/guix-science/guix-science/pull/25
+
+;;; Original author EM.
+;;; Contributions by JF:
+;;; - Add geant4-vis packages that support visualisation using OGL and Qt
+;;; - Use Guix-stye version system and package names
+
+;;; Geant4 documentation:
+;;; - Release notes: https://geant4.web.cern.ch/download/all
+;;; - Installation guide: https://geant4.web.cern.ch/docs/
+
+(define-module (jforst packages geant4)
+  #:use-module ((guix licenses)
+                #:prefix license:)
+  #:use-module (gnu packages adns) ;c-ares
+  #:use-module (gnu packages algebra) ;FFTW
+  #:use-module (gnu packages astronomy) ;cfitsio
+  #:use-module (gnu packages autotools)
+  #:use-module (gnu packages backup)
+  #:use-module (gnu packages base) ;gnu-make, make
+  #:use-module (gnu packages bash)
+  #:use-module (gnu packages boost)
+  #:use-module (gnu packages bootstrap)
+  #:use-module (gnu packages check)
+  #:use-module (gnu packages commencement) ;gcc-toolchain
+  #:use-module (gnu packages compression) ;zlib lz4
+  #:use-module (gnu packages curl)
+  #:use-module (gnu packages databases)
+  #:use-module (gnu packages digest)
+  #:use-module (gnu packages documentation)
+  #:use-module (gnu packages file)
+  #:use-module (gnu packages fontutils) ;fontconfig
+  #:use-module (gnu packages fontutils) ;freetype
+  #:use-module (gnu packages gcc)
+  #:use-module (gnu packages geo)
+  #:use-module (gnu packages gl) ;mesa
+  #:use-module (gnu packages glib)
+  #:use-module (gnu packages hunspell)
+  #:use-module (gnu packages icu4c)
+  #:use-module (gnu packages image) ;libjpeg
+  #:use-module (gnu packages less)
+  #:use-module (gnu packages libevent) ;libuv
+  #:use-module (gnu packages libreoffice) ;hunspell
+  #:use-module (gnu packages linux)
+  #:use-module (gnu packages llvm) ;llvm clang
+  #:use-module (gnu packages maths) ;openblas gsl
+  #:use-module (gnu packages monitoring)
+  #:use-module (gnu packages openstack)
+  #:use-module (gnu packages pcre)
+  #:use-module (gnu packages pdf) ;poppler-qt5
+  #:use-module (gnu packages perl)
+  #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages python)
+  #:use-module (gnu packages python-build)
+  #:use-module (gnu packages python-crypto) ;python-cryptography
+  #:use-module (gnu packages python-web) ;python-oauthlib
+  #:use-module (gnu packages python-xyz) ;numpy
+  #:use-module (gnu packages qt) ;qtbase
+  #:use-module (gnu packages serialization)
+  #:use-module (gnu packages shells)
+  #:use-module (gnu packages shells)
+  #:use-module (gnu packages tbb)
+  #:use-module (gnu packages time)
+  #:use-module (gnu packages tls) ;openssl
+  #:use-module (gnu packages version-control) ;git
+  #:use-module (gnu packages web) ;http-parser
+  #:use-module (gnu packages xml)
+  #:use-module (gnu packages xorg) ;libx11
+  #:use-module (gnu packages)
+  #:use-module (guix build-system cmake)
+  #:use-module (guix build-system gnu)
+  #:use-module (guix build-system python)
+  #:use-module (guix build-system trivial)
+  #:use-module (guix download)
+  #:use-module (guix gexp)
+  #:use-module (guix git-download)
+  #:use-module (guix packages)
+  #:use-module (guix utils)
+
+  #:use-module (ice-9 match)
+  #:use-module (ice-9 regex)
+
+  #:use-module (gnu packages cmake)
+
+  )
+
+;; -- clhep --
+
+(define clhep-2.3.4.3
+  (package
+    (name "clhep")
+    (version "2.3.4.3")
+    (source (origin
+              (method url-fetch)
+              (uri
+               "https://gitlab.cern.ch/CLHEP/CLHEP/-/archive/CLHEP_2_3_4_3/CLHEP-CLHEP_2_3_4_3.tar.gz")
+              (sha256
+               (base32
+                "0h1mpc795lzq0z562jiq8w7rv0l1kwjjb98ynydqmxb0djnsmsli"))))
+    (build-system cmake-build-system)
+    (home-page "https://proj-clhep.web.cern.ch/proj-clhep/")
+    (synopsis "HEP-specific foundation and utility classes")
+    (description
+     "HEP-specific foundation and utility classes such as random generators,
+physics vectors, geometry and linear algebra.
+CLHEP is structured in a set of packages independent of any external package.")
+    (license license:gpl3+)))
+
+(define clhep-2.4.6.2
+  (package
+    (inherit clhep-2.3.4.3)
+    (version "2.4.6.2")
+    (source (origin
+              (method url-fetch)
+              (uri
+               "https://gitlab.cern.ch/CLHEP/CLHEP/-/archive/CLHEP_2_4_6_2/CLHEP-CLHEP_2_4_6_2.tar.gz")
+              (sha256
+               (base32
+                "18sm14ikdz8hym5b2c9yb5l4hvzjk77jfasahb8zs41fcx6r9gwp"))))))
+
+;; -- Geant4 datasets--
+
+;; G4NDL
+;;
+(define g4ndl-4.6
+  (let ((version "4.6"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4NDL."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "022l2jjhi57frfdv9nk6s6q23gmr9zkix06fmni8gf0gmvr7qa4x")))))
+
+(define g4ndl-4.7
+  (let ((version "4.7"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4NDL."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "0283cwylajyjm4267ngfc2bd3452623r5bakywaccb8h44k3szby")))))
+
+;; G4EMLOW
+;;
+(define g4emlow-7.9.1
+  (let ((version "7.9.1"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4EMLOW."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "1jrw0izw732bywq1k1srs3x2z0m3y2h377kcvwbwcr0wa1p10342")))))
+
+(define g4emlow-8.2
+  (let ((version "8.2"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4EMLOW."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "09z4m3hq6895s7vwiaham7zbfq0ww6xh8xh8jv5kp9gm9wk6hxrx")))))
+
+;; PhotonEvaporation
+;;
+(define photon-evaporation-5.5
+  (let ((version "5.5"))
+    (origin
+      (method url-fetch)
+      (uri (string-append
+            "https://cern.ch/geant4-data/datasets/G4PhotonEvaporation."
+            version ".tar.gz"))
+      (sha256 (base32
+               "1mvnbs7yvkii41blks6bkqr8qhxgnj3xxvv1i3vdg2y14shxv5ar")))))
+
+(define photon-evaporation-5.7
+  (let ((version "5.7"))
+    (origin
+      (method url-fetch)
+      (uri (string-append
+            "https://cern.ch/geant4-data/datasets/G4PhotonEvaporation."
+            version ".tar.gz"))
+      (sha256 (base32
+               "1rg7fygfxx06h98ywlci6b0b9ih74q8diygr76c3vppxdzjl47kn")))))
+
+;; RadioactiveDecay
+;;
+(define radioactive-decay-5.4
+  (let ((version "5.4"))
+    (origin
+      (method url-fetch)
+      (uri (string-append
+            "https://cern.ch/geant4-data/datasets/G4RadioactiveDecay." version
+            ".tar.gz"))
+      (sha256 (base32
+               "0qaark6mqzxr3lqawv6ai8z5211qihlp5x2hn86vzx8kgpd7j1r4")))))
+
+(define radioactive-decay-5.6
+  (let ((version "5.6"))
+    (origin
+      (method url-fetch)
+      (uri (string-append
+            "https://cern.ch/geant4-data/datasets/G4RadioactiveDecay." version
+            ".tar.gz"))
+      (sha256 (base32
+               "1w8d9zzc4ss7sh1f8cxv5pmrx2b74p1y26377rw9hnlfkiy0g1iq")))))
+
+;; G4PARTICLEXS
+;;
+(define g4particlexs-2.1
+  (let ((version "2.1"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4PARTICLEXS."
+            version ".tar.gz"))
+      (sha256 (base32
+               "0h8ba8jk197npbd9lzq2qlfiklbjgqwk45m1cc6piy5vf8ri0k89")))))
+
+(define g4particlexs-4.0
+  (let ((version "4.0"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4PARTICLEXS."
+            version ".tar.gz"))
+      (sha256 (base32
+               "15fa6c8jh6g3nj82ychc13wlz2rc58v9jjdb6vyv1wn30fbh70ck")))))
+
+;; G4PII
+;;
+(define g4pii-1.3
+  (let ((version "1.3"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4PII."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "09p92rk1sj837m6n6yd9k9a8gkh6bby2bfn6k0f3ix3m4s8as9b2")))))
+
+;; RealSurface
+;;
+(define real-surface-2.1.1
+  (let ((version "2.1.1"))
+    (origin
+      (method url-fetch)
+      (uri (string-append
+            "https://cern.ch/geant4-data/datasets/G4RealSurface." version
+            ".tar.gz"))
+      (sha256 (base32
+               "0l3gs0nlp10cjlwiln3f72zfch0av2g1r8m2ny9afgvwgbwiyj4h")))))
+
+(define real-surface-2.2
+  (let ((version "2.2"))
+    (origin
+      (method url-fetch)
+      (uri (string-append
+            "https://cern.ch/geant4-data/datasets/G4RealSurface." version
+            ".tar.gz"))
+      (sha256 (base32
+               "08382y1258ifs7nap6zaaazvabg72blr0dkqgwk32lrg07hdwm4r")))))
+
+;; G4SAIDDATA
+;;
+(define g4saiddata-2.0
+  (let ((version "2.0"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4SAIDDATA."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "149fqy801n1pj2g6lcai2ziyvdz8cxdgbfarax6y8wdakgksh9hx")))))
+
+;; G4ABLA
+;;
+(define g4abla-3.1
+  (let ((version "3.1"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4ABLA."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "1v97q28g1xqwnav0lwzwk7hc3b87yrmbvkgadf4bkwcbnm9b163n")))))
+
+;; G4INCL
+;;
+(define g4incl-1.0
+  (let ((version "1.0"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4INCL."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "0z9nqk125vvf4f19lhgb37jy60jf9zrjqg5zbxbd1wz93a162qbi")))))
+
+;; G4ENSDFSTATE
+;;
+(define g4ensdfstate-2.2
+  (let ((version "2.2"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4ENSDFSTATE."
+            version ".tar.gz"))
+      (sha256 (base32
+               "19p0sq0rmyg48j9hddqy24dn99md7ddiyq09lyj381q7cbpjfznx")))))
+
+(define g4ensdfstate-2.3
+  (let ((version "2.3"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4ENSDFSTATE."
+            version ".tar.gz"))
+      (sha256 (base32
+               "00wjir59rrrlk0a12vi8rsnhyya71rdi1kmark9sp487hbhcai4l")))))
+
+;; G4TENDL
+;;
+(define g4tendl-1.4
+  (let ((version "1.4"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4TENDL."
+                          version ".tar.gz"))
+      (sha256 (base32
+               "1q11jxfy5kjwb0jrvwv6dgdxr3h85s6g2bl9kdbfvd681h178wjb")))))
+
+;; -- Geant4 without visualisation -- 
+
+;; (propagated-inputs (list cmake gnu-make ;make
+;; gcc-toolchain))
+(define-public geant4-11-1-1
+  (package
+    (name "geant4")
+    (version "11.1.1")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://gitlab.cern.ch/geant4/geant4/-/archive/v" version
+                    "/geant4-v" version ".tar.gz"))
+              (sha256
+               (base32
+                "1lppxszwsdl4v8rqg55ak1jllkq4jcl9nijswdf7d9lvv8s8d1y5"))))
+
+    (build-system cmake-build-system)
+
+    (inputs (list coreutils
+                  gcc-toolchain
+                  xerces-c ;pour GDML
+                  expat
+                  clhep-2.4.6.2
+                  python-2
+                  python-3.10
+                  perl
+                  tcsh))
+
+    (arguments
+     `(#:configure-flags (let ((out (assoc-ref %outputs "out")))
+                           (list (string-append "-DCMAKE_INSTALL_PREFIX=" out)
+                                 "-DCMAKE_INSTALL_LIBDIR=lib"
+                                 "-DGEANT4_BUILD_MULTITHREADED=ON"
+                                 "-DGEANT4_ENABLE_TESTING=OFF"
+                                 "-DGEANT4_INSTALL_DATA=OFF"
+                                 "-DGEANT4_USE_GDML=ON" ;xerces-c is needed for GDML
+                                 "-DGEANT4_USE_SYSTEM_CLHEP=ON"
+                                 "-DGEANT4_USE_SYSTEM_EXPAT=ON"
+
+                                 (let ((datadir (string-append out
+                                                 "/share/geant4/data")))
+                                   (string-append "-DGEANT4_INSTALL_DATADIR="
+                                                  datadir "/share/geant4/data"))))
+
+       #:phases (modify-phases %standard-phases
+                  (add-after 'install 'install-data
+                    (lambda* (#:key inputs outputs #:allow-other-keys)
+                      (let ((G4NDL (assoc-ref inputs "G4NDL"))
+                            (G4EMLOW (assoc-ref inputs "G4EMLOW"))
+                            (G4PhotonEvaporation (assoc-ref inputs
+                                                  "G4PhotonEvaporation"))
+                            (G4RadioactiveDecay (assoc-ref inputs
+                                                 "G4RadioactiveDecay"))
+                            (G4PARTICLEXS (assoc-ref inputs "G4PARTICLEXS"))
+                            (G4PII (assoc-ref inputs "G4PII"))
+                            (G4RealSurface (assoc-ref inputs "G4RealSurface"))
+                            (G4SAIDDATA (assoc-ref inputs "G4SAIDDATA"))
+                            (G4ABLA (assoc-ref inputs "G4ABLA"))
+                            (G4INCL (assoc-ref inputs "G4INCL"))
+                            (G4ENSDFSTATE (assoc-ref inputs "G4ENSDFSTATE"))
+                            (G4TENDL (assoc-ref inputs "G4TENDL"))
+
+                            (datadir (string-append (assoc-ref outputs "out")
+                                                    "/share/geant4/data")))
+                        (display (list "Data archives:"
+                                       G4NDL
+                                       G4EMLOW
+                                       G4PhotonEvaporation
+                                       G4RadioactiveDecay
+                                       G4PARTICLEXS
+                                       G4PII
+                                       G4RealSurface
+                                       G4SAIDDATA
+                                       G4ABLA
+                                       G4INCL
+                                       G4ENSDFSTATE))
+                        (newline)
+
+                        (mkdir-p datadir)
+                        (invoke "tar" "xvf" G4NDL "-C" datadir)
+                        (invoke "tar" "xvf" G4EMLOW "-C" datadir)
+                        (invoke "tar" "xvf" G4PhotonEvaporation "-C" datadir)
+                        (invoke "tar" "xvf" G4RadioactiveDecay "-C" datadir)
+                        (invoke "tar" "xvf" G4PARTICLEXS "-C" datadir)
+                        (invoke "tar" "xvf" G4PII "-C" datadir)
+                        (invoke "tar" "xvf" G4RealSurface "-C" datadir)
+                        (invoke "tar" "xvf" G4SAIDDATA "-C" datadir)
+                        (invoke "tar" "xvf" G4ABLA "-C" datadir)
+                        (invoke "tar" "xvf" G4INCL "-C" datadir)
+                        (invoke "tar" "xvf" G4ENSDFSTATE "-C" datadir)
+                        (invoke "tar" "xvf" G4TENDL "-C" datadir)))))
+
+       ;; no tests in Makefile
+       #:tests? #f))
+
+    (native-inputs `(("G4NDL" ,g4ndl-4.7)
+                     ("G4EMLOW" ,g4emlow-8.2)
+                     ("G4PhotonEvaporation" ,photon-evaporation-5.7)
+                     ("G4RadioactiveDecay" ,radioactive-decay-5.6)
+                     ("G4PARTICLEXS" ,g4particlexs-4.0)
+                     ("G4PII" ,g4pii-1.3)
+                     ("G4RealSurface" ,real-surface-2.2)
+                     ("G4SAIDDATA" ,g4saiddata-2.0)
+                     ("G4ABLA" ,g4abla-3.1)
+                     ("G4INCL" ,g4incl-1.0)
+                     ("G4ENSDFSTATE" ,g4ensdfstate-2.3)
+                     ("G4TENDL" ,g4tendl-1.4)))
+
+    (home-page "https://geant4.web.cern.ch")
+    (synopsis "Monte Carlo particle track simulations")
+    (description
+     "Geant4 is a toolkit for the simulation of the passage of particles
+through matter.  Its areas of application include high energy,
+nuclear and accelerator physics, as well as studies
+in medical and space science.
+
+Note this package does not support visualisation -- you
+can use @code{geant4-vis} for that.")
+    (license (license:non-copyleft
+              "https://geant4.web.cern.ch/download/license"))))
+
+(define-public geant4-11-1-2
+  (package
+    (inherit geant4-11-1-1)
+    (name "geant4")
+    (version "11.1.2")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://gitlab.cern.ch/geant4/geant4/-/archive/v" version
+                    "/geant4-v" version ".tar.gz"))
+              (sha256
+               (base32
+                "1bw9xddncbz3x97anjyrb7dvmmklw4vrbz98y09r4pa4ik8qmpz9"))))))
+
+;; -- Geant4 with visualisation using OGL + Qt -- 
+
+;; (propagated-inputs (list cmake gnu-make ;make
+;; gcc-toolchain mesa))
+(define-public geant4-vis-11-1-1
+  (package
+    (inherit geant4-11-1-1)
+    (name "geant4-vis")
+    (version "11.1.1")
+
+    (inputs `(("coreutils" ,coreutils)
+              ("gcc-toolchain" ,gcc-toolchain)
+              ("xerces-c" ,xerces-c)
+              ("expat" ,expat)
+              ("clhep" ,clhep-2.4.6.2)
+              ("python2" ,python-2)
+              ("python" ,python-3.10)
+              ("perl" ,perl)
+              ("tcsh" ,tcsh)
+              ("qtbase" ,qtbase-5)
+              ("libxmu" ,libxmu)
+              ("libxt" ,libxt)))
+
+    (arguments
+     `(#:configure-flags (let* ((out (assoc-ref %outputs "out"))
+                                (qt-path (string-append (assoc-ref
+                                                         %build-inputs
+                                                         "qtbase")
+                                                        "/lib/cmake/Qt5")))
+                           (list (string-append "-DCMAKE_INSTALL_PREFIX=" out)
+                                 (string-append "-DCMAKE_PREFIX_PATH=" qt-path)
+
+                                 "-DCMAKE_INSTALL_LIBDIR=lib"
+                                 "-DGEANT4_BUILD_MULTITHREADED=ON"
+                                 "-DGEANT4_ENABLE_TESTING=OFF"
+                                 "-DGEANT4_INSTALL_DATA=OFF"
+                                 "-DGEANT4_USE_GDML=ON" ;xerces-c is needed for GDML
+                                 "-DGEANT4_USE_SYSTEM_CLHEP=ON"
+                                 "-DGEANT4_USE_SYSTEM_EXPAT=ON"
+
+                                 "-DGEANT4_USE_OPENGL_X11=ON"
+                                 "-DGEANT4_USE_QT=ON"
+
+                                 (let ((datadir (string-append out
+                                                 "/share/geant4/data")))
+                                   (string-append "-DGEANT4_INSTALL_DATADIR="
+                                                  datadir "/share/geant4/data"))))
+
+       #:phases (modify-phases %standard-phases
+                  (add-after 'install 'install-data
+                    (lambda* (#:key inputs outputs #:allow-other-keys)
+                      (let ((G4NDL (assoc-ref inputs "G4NDL"))
+                            (G4EMLOW (assoc-ref inputs "G4EMLOW"))
+                            (G4PhotonEvaporation (assoc-ref inputs
+                                                  "G4PhotonEvaporation"))
+                            (G4RadioactiveDecay (assoc-ref inputs
+                                                 "G4RadioactiveDecay"))
+                            (G4PARTICLEXS (assoc-ref inputs "G4PARTICLEXS"))
+                            (G4PII (assoc-ref inputs "G4PII"))
+                            (G4RealSurface (assoc-ref inputs "G4RealSurface"))
+                            (G4SAIDDATA (assoc-ref inputs "G4SAIDDATA"))
+                            (G4ABLA (assoc-ref inputs "G4ABLA"))
+                            (G4INCL (assoc-ref inputs "G4INCL"))
+                            (G4ENSDFSTATE (assoc-ref inputs "G4ENSDFSTATE"))
+                            (G4TENDL (assoc-ref inputs "G4TENDL"))
+
+                            (datadir (string-append (assoc-ref outputs "out")
+                                                    "/share/geant4/data")))
+                        (display (list "Data archives:"
+                                       G4NDL
+                                       G4EMLOW
+                                       G4PhotonEvaporation
+                                       G4RadioactiveDecay
+                                       G4PARTICLEXS
+                                       G4PII
+                                       G4RealSurface
+                                       G4SAIDDATA
+                                       G4ABLA
+                                       G4INCL
+                                       G4ENSDFSTATE))
+                        (newline)
+
+                        (mkdir-p datadir)
+                        (invoke "tar" "xvf" G4NDL "-C" datadir)
+                        (invoke "tar" "xvf" G4EMLOW "-C" datadir)
+                        (invoke "tar" "xvf" G4PhotonEvaporation "-C" datadir)
+                        (invoke "tar" "xvf" G4RadioactiveDecay "-C" datadir)
+                        (invoke "tar" "xvf" G4PARTICLEXS "-C" datadir)
+                        (invoke "tar" "xvf" G4PII "-C" datadir)
+                        (invoke "tar" "xvf" G4RealSurface "-C" datadir)
+                        (invoke "tar" "xvf" G4SAIDDATA "-C" datadir)
+                        (invoke "tar" "xvf" G4ABLA "-C" datadir)
+                        (invoke "tar" "xvf" G4INCL "-C" datadir)
+                        (invoke "tar" "xvf" G4ENSDFSTATE "-C" datadir)
+                        (invoke "tar" "xvf" G4TENDL "-C" datadir)))))
+
+       ;; no tests in Makefile
+       #:tests? #f))
+
+    (description
+     "Geant4 is a toolkit for the simulation of the passage of particles
+through matter.  Its areas of application include high energy,
+nuclear and accelerator physics, as well as studies
+in medical and space science.
+
+This package supports visualisation with OpenGL and Qt.")))
+
+(define-public geant4-vis-11-1-2
+  (package
+    (inherit geant4-vis-11-1-1)
+    (name "geant4-vis")
+    (version "11.1.2")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://gitlab.cern.ch/geant4/geant4/-/archive/v" version
+                    "/geant4-v" version ".tar.gz"))
+              (sha256
+               (base32
+                "1bw9xddncbz3x97anjyrb7dvmmklw4vrbz98y09r4pa4ik8qmpz9"))))))

@@ -1,0 +1,89 @@
+This is a personal collection of [[https://guix.gnu.org][GNU Guix]] package definitions.
+
+* Packages
+
+This channel provides packages: 
+- ~geant4~
+- ~geant4-vis~
+- ~python-radcomp~
+ 
+** geant4
+
+~geant4~ is [[https://geant4.web.cern.ch][Geant4]] without support for visualisation.
+
+Versions provided:
+- 11.1.2
+- 11.1.1
+
+Minimal environment:
+  
+#+begin_src shell
+
+  guix shell geant4 cmake make gcc-toolchain
+
+  # copy an example app
+  INSTALL_DIR=$(guix build geant4)
+  cp -rf $INSTALL_DIR/share/Geant4/examples/basic/B1 .
+
+  # the store is read only
+  chmod -R 751 B1/
+
+  # the usual
+  cd B1
+  mkdir build
+  cd build
+  cmake ..; make
+  ./exampleB1 run1.mac
+
+#+end_src
+
+NB. Do not source =$INSTALL_DIR/bin/geant4.sh=.
+
+** geant4-vis
+
+~geant4-vis~ is [[https://geant4.web.cern.ch][Geant4]] including support for visualisation with OpenGL and Qt.
+
+Versions provided:
+- 11.1.2
+- 11.1.1
+
+Minimal environment:
+
+#+begin_src shell
+
+  guix shell geant4-vis cmake make gcc-toolchain mesa
+
+  # copy an example app
+  INSTALL_DIR=$(guix build geant4-vis)
+  cp -rf $INSTALL_DIR/share/Geant4/examples/basic/B1 .
+
+  # the store is read only
+  chmod -R 751 B1/
+
+  # the usual
+  cd B1
+  mkdir build
+  cd build
+  cmake ..; make
+  ./exampleB1
+
+#+end_src
+
+NB. Do not source =$INSTALL_DIR/bin/geant4.sh=.
+
+** python-radcomp
+
+~python-radcomp~ is the Python [[https://github.com/jakeforster/radcomp][package]].
+
+Versions provided:
+- 0.2.0
+
+Example environment:
+
+#+begin_src shell
+
+  guix shell python python-radcomp python-tornado 
+  export MPLBACKEND=WebAgg
+
+#+end_src
+
