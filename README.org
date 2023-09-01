@@ -87,3 +87,31 @@ Example environment:
 
 #+end_src
 
+* Usage
+
+To use this channel, add it to your configuration in =~/.config/guix/channels.scm=, e.g.:
+
+#+begin_src scheme
+
+  (cons* (channel
+           (name 'jforst)
+           (url "https://github.com/jakeforster/guix-channel")
+           (branch "master")
+           (introduction
+            (make-channel-introduction
+             "ff010b01733bf1a0f2dd5f0d575730d03a107fe4"
+             (openpgp-fingerprint
+              "CFE9 8893 632A 4A6C 43E6  BF38 C6C6 5219 AA51 07F3"))))
+         %default-channels)
+
+#+end_src
+
+Alternatively, you can install a package from this channel by temporarily adding the channel to your load path. E.g., in a one-off environment:
+
+#+begin_src shell
+
+  git clone https://github.com/jakeforster/guix-channel.git
+  guix shell -L ./guix-channel geant4 cmake make gcc-toolchain
+
+#+end_src
+
