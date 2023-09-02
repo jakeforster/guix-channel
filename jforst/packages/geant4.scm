@@ -352,14 +352,12 @@ CLHEP is structured in a set of packages independent of any external package.")
     (source (origin
               (method url-fetch)
               (uri (string-append
-                    "https://gitlab.cern.ch/geant4/geant4/-/archive/v" version
-                    "/geant4-v" version ".tar.gz"))
+                    "http://cern.ch/geant4-data/releases/geant4-v" version
+                    ".tar.gz"))
               (sha256
                (base32
-                "1lppxszwsdl4v8rqg55ak1jllkq4jcl9nijswdf7d9lvv8s8d1y5"))))
-
+                "0sg45nd47ajqhzncw5fahrrx8a9s54x1l31l6xa73xsx5bmj54fj"))))
     (build-system cmake-build-system)
-
     (inputs (list coreutils
                   gcc-toolchain
                   xerces-c ;pour GDML
@@ -369,7 +367,6 @@ CLHEP is structured in a set of packages independent of any external package.")
                   python-3.10
                   perl
                   tcsh))
-
     (arguments
      `(#:configure-flags (let ((out (assoc-ref %outputs "out")))
                            (list (string-append "-DCMAKE_INSTALL_PREFIX=" out)
@@ -466,16 +463,15 @@ can use @code{geant4-vis} for that.")
 (define-public geant4-11-1-2
   (package
     (inherit geant4-11-1-1)
-    (name "geant4")
     (version "11.1.2")
     (source (origin
               (method url-fetch)
               (uri (string-append
-                    "https://gitlab.cern.ch/geant4/geant4/-/archive/v" version
-                    "/geant4-v" version ".tar.gz"))
+                    "http://cern.ch/geant4-data/releases/geant4-v" version
+                    ".tar.gz"))
               (sha256
                (base32
-                "1bw9xddncbz3x97anjyrb7dvmmklw4vrbz98y09r4pa4ik8qmpz9"))))))
+                "1ma7qswqf320v03ry3j9sc20rjvn5ailp3g9k32bk7vlw29jsy3v"))))))
 
 ;; -- Geant4 with visualisation using OGL + Qt -- 
 
@@ -485,8 +481,6 @@ can use @code{geant4-vis} for that.")
   (package
     (inherit geant4-11-1-1)
     (name "geant4-vis")
-    (version "11.1.1")
-
     (inputs `(("coreutils" ,coreutils)
               ("gcc-toolchain" ,gcc-toolchain)
               ("xerces-c" ,xerces-c)
@@ -499,7 +493,6 @@ can use @code{geant4-vis} for that.")
               ("qtbase" ,qtbase-5)
               ("libxmu" ,libxmu)
               ("libxt" ,libxt)))
-
     (arguments
      `(#:configure-flags (let* ((out (assoc-ref %outputs "out"))
                                 (qt-path (string-append (assoc-ref
@@ -587,13 +580,13 @@ This package supports visualisation with OpenGL and Qt.")))
 (define-public geant4-vis-11-1-2
   (package
     (inherit geant4-vis-11-1-1)
-    (name "geant4-vis")
     (version "11.1.2")
     (source (origin
               (method url-fetch)
               (uri (string-append
-                    "https://gitlab.cern.ch/geant4/geant4/-/archive/v" version
-                    "/geant4-v" version ".tar.gz"))
+                    "http://cern.ch/geant4-data/releases/geant4-v" version
+                    ".tar.gz"))
               (sha256
                (base32
-                "1bw9xddncbz3x97anjyrb7dvmmklw4vrbz98y09r4pa4ik8qmpz9"))))))
+                "1ma7qswqf320v03ry3j9sc20rjvn5ailp3g9k32bk7vlw29jsy3v"))))))
+
