@@ -30,16 +30,16 @@
   #:use-module ((guix licenses)
                 #:prefix license:))
 
-(define-public python-radcomp-0-2-0
+(define-public python-radcomp
   (package
     (name "python-radcomp")
-    (version "0.2.0")
-    (source (origin
-              (method url-fetch)
-              (uri (pypi-uri "radcomp" version))
-              (sha256
-               (base32
-                "0nw5wmf3f510346zkkkiwg86ma6mchwrbz75s3xifzvc49mkccgc"))))
+    (version "0.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "radcomp" version))
+       (sha256
+        (base32 "03hqrahmm7690x1hnhpvglm8077z6kakqv9as1f9w1fy70b2gvrl"))))
     (build-system pyproject-build-system)
     (native-inputs `(("python-hatchling" ,python-hatchling)
                      ("python-pytest" ,python-pytest)))
