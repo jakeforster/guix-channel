@@ -5,7 +5,9 @@ This is a personal collection of [[https://guix.gnu.org][GNU Guix]] package defi
 This channel provides packages: 
 - ~geant4~
 - ~geant4-vis~
+- ~dawn~
 - ~python-radcomp~
+- ~emacs-numpydoc~
  
 ** geant4
 
