@@ -473,6 +473,20 @@ can use @code{geant4-vis} for that.")
                (base32
                 "1ma7qswqf320v03ry3j9sc20rjvn5ailp3g9k32bk7vlw29jsy3v"))))))
 
+(define-public geant4-11-1-3
+  (package
+    (inherit geant4-11-1-1)
+    (version "11.1.3")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "http://cern.ch/geant4-data/releases/geant4-v" version
+                    ".tar.gz"))
+              (sha256
+               (base32
+                "1xcj4vigk7mb7wylr5zr3c7ac4ajdcfn786cvag633cxg2kbwpsc"))))))
+
+
 ;; -- Geant4 with visualisation using OGL + Qt -- 
 
 ;; (propagated-inputs (list cmake gnu-make ;make
@@ -590,3 +604,15 @@ This package supports visualisation with OpenGL and Qt.")))
                (base32
                 "1ma7qswqf320v03ry3j9sc20rjvn5ailp3g9k32bk7vlw29jsy3v"))))))
 
+(define-public geant4-vis-11-1-3
+  (package
+    (inherit geant4-vis-11-1-1)
+    (version "11.1.3")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "http://cern.ch/geant4-data/releases/geant4-v" version
+                    ".tar.gz"))
+              (sha256
+               (base32
+		"1xcj4vigk7mb7wylr5zr3c7ac4ajdcfn786cvag633cxg2kbwpsc"))))))
