@@ -86,6 +86,8 @@
   #:use-module (gnu packages web) ;http-parser
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg) ;libx11
+  #:use-module (gnu packages imagemagick) 
+  #:use-module (gnu packages tcl) ;tk
   #:use-module (gnu packages)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system gnu)
