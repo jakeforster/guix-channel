@@ -90,9 +90,6 @@ Example usage:
 
 ~python-radcomp~ is the Python [[https://github.com/jakeforster/radcomp][package]].
 
-Versions provided:
-- 0.2.0
-
 Example environment:
 
 #+begin_src shell
