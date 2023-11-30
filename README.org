@@ -71,6 +71,19 @@ Minimal environment:
 
 NB. Do not source =$INSTALL_DIR/bin/geant4.sh=.
 
+** dawn
+
+~dawn~ is the Fukui Renderer [[https://geant4.kek.jp/~tanaka/DAWN/About_DAWN.html][DAWN]] by Satoshi Tanaka, which can be used to create high quality rendering of 3D data from Geant4 simulations.
+
+Example usage:
+
+#+begin_src shell
+
+  guix shell dawn
+  dawn primitives.prim
+
+#+end_src
+
 ** python-radcomp
 
 ~python-radcomp~ is the Python [[https://github.com/jakeforster/radcomp][package]].
@@ -86,6 +99,10 @@ Example environment:
   export MPLBACKEND=WebAgg
 
 #+end_src
+
+** emacs-numpydoc
+
+~emacs-numpydoc~ is the Emacs Lisp package [[https://github.com/douglasdavis/numpydoc.el][numpydoc]] for inserting NumPy style docstrings in Python function definitions.
 
 * Usage
 
