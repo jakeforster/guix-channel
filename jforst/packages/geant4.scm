@@ -170,6 +170,7 @@ CLHEP is structured in a set of packages independent of any external package.")
                           version ".tar.gz"))
       (sha256 (base32 "1jrw0izw732bywq1k1srs3x2z0m3y2h377kcvwbwcr0wa1p10342")))))
 
+;; works for <11.2.0
 (define g4emlow-8.2
   (let ((version "8.2"))
     (origin
@@ -177,6 +178,14 @@ CLHEP is structured in a set of packages independent of any external package.")
       (uri (string-append "https://cern.ch/geant4-data/datasets/G4EMLOW."
                           version ".tar.gz"))
       (sha256 (base32 "09z4m3hq6895s7vwiaham7zbfq0ww6xh8xh8jv5kp9gm9wk6hxrx")))))
+
+(define g4emlow-8.5
+  (let ((version "8.5"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4EMLOW."
+                          version ".tar.gz"))
+      (sha256 (base32 "0wzgpklx776f14crhriyh08ya9b24vxv89f122nf4iaxmi4wmfk6")))))
 
 ;; PhotonEvaporation
 ;;
@@ -278,6 +287,7 @@ CLHEP is structured in a set of packages independent of any external package.")
 
 ;; G4ABLA
 ;;
+;; works for <11.2.0
 (define g4abla-3.1
   (let ((version "3.1"))
     (origin
@@ -286,8 +296,17 @@ CLHEP is structured in a set of packages independent of any external package.")
                           version ".tar.gz"))
       (sha256 (base32 "1v97q28g1xqwnav0lwzwk7hc3b87yrmbvkgadf4bkwcbnm9b163n")))))
 
+;; (define g4abla-3.3
+;;   (let ((version "3.3"))
+;;     (origin
+;;       (method url-fetch)
+;;       (uri (string-append "https://cern.ch/geant4-data/datasets/G4ABLA."
+;;                           version ".tar.gz"))
+;;       (sha256 (base32 "1cd25vckckxkhyx3pvz5swral0rkd4z7akv2dn4fz77fa8r1n10y")))))
+
 ;; G4INCL
 ;;
+;; works for <11.2.0
 (define g4incl-1.0
   (let ((version "1.0"))
     (origin
@@ -295,6 +314,14 @@ CLHEP is structured in a set of packages independent of any external package.")
       (uri (string-append "https://cern.ch/geant4-data/datasets/G4INCL."
                           version ".tar.gz"))
       (sha256 (base32 "0z9nqk125vvf4f19lhgb37jy60jf9zrjqg5zbxbd1wz93a162qbi")))))
+
+;; (define g4incl-1.2
+;;   (let ((version "1.2"))
+;;     (origin
+;;       (method url-fetch)
+;;       (uri (string-append "https://cern.ch/geant4-data/datasets/G4INCL."
+;;                           version ".tar.gz"))
+;;       (sha256 (base32 "0zhs1vnrc0vhb1y4q3bscz9y2k9dsnk7ccjg97br42pffdhb307q")))))
 
 ;; G4ENSDFSTATE
 ;;
