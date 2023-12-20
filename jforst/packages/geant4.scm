@@ -86,7 +86,7 @@
   #:use-module (gnu packages web) ;http-parser
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg) ;libx11
-  #:use-module (gnu packages imagemagick) 
+  #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages tcl) ;tk
   #:use-module (gnu packages)
   #:use-module (guix build-system cmake)
@@ -296,13 +296,13 @@ CLHEP is structured in a set of packages independent of any external package.")
                           version ".tar.gz"))
       (sha256 (base32 "1v97q28g1xqwnav0lwzwk7hc3b87yrmbvkgadf4bkwcbnm9b163n")))))
 
-;; (define g4abla-3.3
-;;   (let ((version "3.3"))
-;;     (origin
-;;       (method url-fetch)
-;;       (uri (string-append "https://cern.ch/geant4-data/datasets/G4ABLA."
-;;                           version ".tar.gz"))
-;;       (sha256 (base32 "1cd25vckckxkhyx3pvz5swral0rkd4z7akv2dn4fz77fa8r1n10y")))))
+(define g4abla-3.3
+  (let ((version "3.3"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4ABLA."
+                          version ".tar.gz"))
+      (sha256 (base32 "1cd25vckckxkhyx3pvz5swral0rkd4z7akv2dn4fz77fa8r1n10y")))))
 
 ;; G4INCL
 ;;
@@ -315,13 +315,13 @@ CLHEP is structured in a set of packages independent of any external package.")
                           version ".tar.gz"))
       (sha256 (base32 "0z9nqk125vvf4f19lhgb37jy60jf9zrjqg5zbxbd1wz93a162qbi")))))
 
-;; (define g4incl-1.2
-;;   (let ((version "1.2"))
-;;     (origin
-;;       (method url-fetch)
-;;       (uri (string-append "https://cern.ch/geant4-data/datasets/G4INCL."
-;;                           version ".tar.gz"))
-;;       (sha256 (base32 "0zhs1vnrc0vhb1y4q3bscz9y2k9dsnk7ccjg97br42pffdhb307q")))))
+(define g4incl-1.2
+  (let ((version "1.2"))
+    (origin
+      (method url-fetch)
+      (uri (string-append "https://cern.ch/geant4-data/datasets/G4INCL."
+                          version ".tar.gz"))
+      (sha256 (base32 "0zhs1vnrc0vhb1y4q3bscz9y2k9dsnk7ccjg97br42pffdhb307q")))))
 
 ;; G4ENSDFSTATE
 ;;
@@ -444,7 +444,7 @@ CLHEP is structured in a set of packages independent of any external package.")
        #:tests? #f))
 
     (native-inputs `(("G4NDL" ,g4ndl-4.7)
-                     ("G4EMLOW" ,g4emlow-8.5)
+                     ("G4EMLOW" ,g4emlow-8.2)
                      ("G4PhotonEvaporation" ,photon-evaporation-5.7)
                      ("G4RadioactiveDecay" ,radioactive-decay-5.6)
                      ("G4PARTICLEXS" ,g4particlexs-4.0)
@@ -503,8 +503,19 @@ can use @code{geant4-vis} for that.")
        (uri (string-append "http://cern.ch/geant4-data/releases/geant4-v"
                            version ".tar.gz"))
        (sha256
-        (base32 "19lnanrq2z8i5ldw1jsv4cclh64348z6vpbpvl5vvd2w7jmpzba6"))))))
-
+        (base32 "19lnanrq2z8i5ldw1jsv4cclh64348z6vpbpvl5vvd2w7jmpzba6"))))
+    (native-inputs `(("G4NDL" ,g4ndl-4.7)
+                     ("G4EMLOW" ,g4emlow-8.5)
+                     ("G4PhotonEvaporation" ,photon-evaporation-5.7)
+                     ("G4RadioactiveDecay" ,radioactive-decay-5.6)
+                     ("G4PARTICLEXS" ,g4particlexs-4.0)
+                     ("G4PII" ,g4pii-1.3)
+                     ("G4RealSurface" ,real-surface-2.2)
+                     ("G4SAIDDATA" ,g4saiddata-2.0)
+                     ("G4ABLA" ,g4abla-3.3)
+                     ("G4INCL" ,g4incl-1.2)
+                     ("G4ENSDFSTATE" ,g4ensdfstate-2.3)
+                     ("G4TENDL" ,g4tendl-1.4)))))
 
 ;; -- Geant4 with visualisation using OGL + Qt -- 
 
@@ -634,7 +645,6 @@ This package supports visualisation with OpenGL and Qt.")))
        (sha256
         (base32 "1xcj4vigk7mb7wylr5zr3c7ac4ajdcfn786cvag633cxg2kbwpsc"))))))
 
-
 (define-public geant4-vis-11-2-0
   (package
     (inherit geant4-vis-11-1-1)
@@ -645,8 +655,19 @@ This package supports visualisation with OpenGL and Qt.")))
        (uri (string-append "http://cern.ch/geant4-data/releases/geant4-v"
                            version ".tar.gz"))
        (sha256
-        (base32 "19lnanrq2z8i5ldw1jsv4cclh64348z6vpbpvl5vvd2w7jmpzba6"))))))
-
+        (base32 "19lnanrq2z8i5ldw1jsv4cclh64348z6vpbpvl5vvd2w7jmpzba6"))))
+    (native-inputs `(("G4NDL" ,g4ndl-4.7)
+                     ("G4EMLOW" ,g4emlow-8.5)
+                     ("G4PhotonEvaporation" ,photon-evaporation-5.7)
+                     ("G4RadioactiveDecay" ,radioactive-decay-5.6)
+                     ("G4PARTICLEXS" ,g4particlexs-4.0)
+                     ("G4PII" ,g4pii-1.3)
+                     ("G4RealSurface" ,real-surface-2.2)
+                     ("G4SAIDDATA" ,g4saiddata-2.0)
+                     ("G4ABLA" ,g4abla-3.3)
+                     ("G4INCL" ,g4incl-1.2)
+                     ("G4ENSDFSTATE" ,g4ensdfstate-2.3)
+                     ("G4TENDL" ,g4tendl-1.4)))))
 
 ;; -- DAWN visualisation tool for Geant4 -- 
 
