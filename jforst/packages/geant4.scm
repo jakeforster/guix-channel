@@ -444,7 +444,7 @@ CLHEP is structured in a set of packages independent of any external package.")
        #:tests? #f))
 
     (native-inputs `(("G4NDL" ,g4ndl-4.7)
-                     ("G4EMLOW" ,g4emlow-8.2)
+                     ("G4EMLOW" ,g4emlow-8.5)
                      ("G4PhotonEvaporation" ,photon-evaporation-5.7)
                      ("G4RadioactiveDecay" ,radioactive-decay-5.6)
                      ("G4PARTICLEXS" ,g4particlexs-4.0)
