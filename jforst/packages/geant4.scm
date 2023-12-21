@@ -170,7 +170,6 @@ CLHEP is structured in a set of packages independent of any external package.")
                           version ".tar.gz"))
       (sha256 (base32 "1jrw0izw732bywq1k1srs3x2z0m3y2h377kcvwbwcr0wa1p10342")))))
 
-;; works for <11.2.0
 (define g4emlow-8.2
   (let ((version "8.2"))
     (origin
@@ -287,7 +286,6 @@ CLHEP is structured in a set of packages independent of any external package.")
 
 ;; G4ABLA
 ;;
-;; works for <11.2.0
 (define g4abla-3.1
   (let ((version "3.1"))
     (origin
@@ -306,7 +304,6 @@ CLHEP is structured in a set of packages independent of any external package.")
 
 ;; G4INCL
 ;;
-;; works for <11.2.0
 (define g4incl-1.0
   (let ((version "1.0"))
     (origin
@@ -493,6 +490,7 @@ can use @code{geant4-vis} for that.")
        (sha256
         (base32 "1xcj4vigk7mb7wylr5zr3c7ac4ajdcfn786cvag633cxg2kbwpsc"))))))
 
+;; bump versions of: G4EMLOW, G4ABLA, G4INCL
 (define-public geant4-11-2-0
   (package
     (inherit geant4-11-1-1)
@@ -645,6 +643,7 @@ This package supports visualisation with OpenGL and Qt.")))
        (sha256
         (base32 "1xcj4vigk7mb7wylr5zr3c7ac4ajdcfn786cvag633cxg2kbwpsc"))))))
 
+;; bump versions of: G4EMLOW, G4ABLA, G4INCL
 (define-public geant4-vis-11-2-0
   (package
     (inherit geant4-vis-11-1-1)
