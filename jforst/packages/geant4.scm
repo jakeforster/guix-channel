@@ -106,7 +106,7 @@
 
   )
 
-;; -- clhep --
+;; -- CLHEP library --
 
 (define clhep-2.3.4.3
   (package
@@ -139,6 +139,18 @@ CLHEP is structured in a set of packages independent of any external package.")
         "https://gitlab.cern.ch/CLHEP/CLHEP/-/archive/CLHEP_2_4_6_2/CLHEP-CLHEP_2_4_6_2.tar.gz")
        (sha256
         (base32 "18sm14ikdz8hym5b2c9yb5l4hvzjk77jfasahb8zs41fcx6r9gwp"))))))
+
+(define clhep-2.4.7.1
+  (package
+    (inherit clhep-2.3.4.3)
+    (version "2.4.7.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri
+        "https://gitlab.cern.ch/CLHEP/CLHEP/-/archive/CLHEP_2_4_7_1/CLHEP-CLHEP_2_4_7_1.tar.gz")
+       (sha256
+        (base32 "02ylrjrak1m0nmdz7zjdkipi2668gkx72d1mknxc8sc3zgndyfbc"))))))
 
 ;; -- Geant4 datasets--
 
@@ -490,7 +502,7 @@ can use @code{geant4-vis} for that.")
        (sha256
         (base32 "1xcj4vigk7mb7wylr5zr3c7ac4ajdcfn786cvag633cxg2kbwpsc"))))))
 
-;; bump versions of: G4EMLOW, G4ABLA, G4INCL
+;; bump versions of: CLHEP, G4EMLOW, G4ABLA, G4INCL
 (define-public geant4-11-2-0
   (package
     (inherit geant4-11-1-1)
@@ -502,6 +514,15 @@ can use @code{geant4-vis} for that.")
                            version ".tar.gz"))
        (sha256
         (base32 "19lnanrq2z8i5ldw1jsv4cclh64348z6vpbpvl5vvd2w7jmpzba6"))))
+    (inputs (list coreutils
+                  gcc-toolchain
+                  xerces-c ;pour GDML
+                  expat
+		  clhep-2.4.7.1
+                  python-2
+                  python-3.10
+                  perl
+                  tcsh))
     (native-inputs `(("G4NDL" ,g4ndl-4.7)
                      ("G4EMLOW" ,g4emlow-8.5)
                      ("G4PhotonEvaporation" ,photon-evaporation-5.7)
@@ -523,18 +544,18 @@ can use @code{geant4-vis} for that.")
   (package
     (inherit geant4-11-1-1)
     (name "geant4-vis")
-    (inputs `(("coreutils" ,coreutils)
-              ("gcc-toolchain" ,gcc-toolchain)
-              ("xerces-c" ,xerces-c)
-              ("expat" ,expat)
-              ("clhep" ,clhep-2.4.6.2)
-              ("python2" ,python-2)
-              ("python" ,python-3.10)
-              ("perl" ,perl)
-              ("tcsh" ,tcsh)
-              ("qtbase" ,qtbase-5)
-              ("libxmu" ,libxmu)
-              ("libxt" ,libxt)))
+    (inputs (list coreutils
+		  gcc-toolchain
+		  xerces-c
+		  expat
+		  clhep-2.4.6.2
+		  python-2
+		  python-3.10
+		  perl
+		  tcsh
+		  qtbase-5
+		  libxmu
+		  libxt))
     (arguments
      `(#:configure-flags (let* ((out (assoc-ref %outputs "out"))
                                 (qt-path (string-append (assoc-ref
@@ -643,7 +664,7 @@ This package supports visualisation with OpenGL and Qt.")))
        (sha256
         (base32 "1xcj4vigk7mb7wylr5zr3c7ac4ajdcfn786cvag633cxg2kbwpsc"))))))
 
-;; bump versions of: G4EMLOW, G4ABLA, G4INCL
+;; bump versions of: CLHEP, G4EMLOW, G4ABLA, G4INCL
 (define-public geant4-vis-11-2-0
   (package
     (inherit geant4-vis-11-1-1)
@@ -655,6 +676,18 @@ This package supports visualisation with OpenGL and Qt.")))
                            version ".tar.gz"))
        (sha256
         (base32 "19lnanrq2z8i5ldw1jsv4cclh64348z6vpbpvl5vvd2w7jmpzba6"))))
+    (inputs (list coreutils
+		  gcc-toolchain
+		  xerces-c
+		  expat
+		  clhep-2.4.7.1
+		  python-2
+		  python-3.10
+		  perl
+		  tcsh
+		  qtbase-5
+		  libxmu
+		  libxt))
     (native-inputs `(("G4NDL" ,g4ndl-4.7)
                      ("G4EMLOW" ,g4emlow-8.5)
                      ("G4PhotonEvaporation" ,photon-evaporation-5.7)
